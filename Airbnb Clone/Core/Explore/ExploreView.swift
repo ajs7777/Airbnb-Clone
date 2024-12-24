@@ -9,17 +9,29 @@ import SwiftUI
 
 struct ExploreView: View {
     var body: some View {
-       NavigationStack {
-           ScrollView {
+        NavigationStack {
+            ScrollView {
                 SearchBarFilter()
                 LazyVStack(spacing: 32) {
-                   ForEach(0...10, id: \.self) { listings in
-                       ListingItemView()
-                           
+                    ForEach(0...10, id: \.self) { listing in
+                        NavigationLink(value: listing) {
+                            ListingItemView()
+                        }
                     }
                 } .padding()
+                
             }
+            .navigationDestination(for: Int.self) { listing in
+                ListingDetailView()
+                    .navigationBarBackButtonHidden()
+                    .navigationBarHidden(true)
+            }
+            
+            
         }
+        
+        
+        
     }
 }
 

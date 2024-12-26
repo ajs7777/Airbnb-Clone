@@ -18,125 +18,123 @@ struct DestinationSearchView: View {
     @Binding var show : Bool
     @State var searchText = ""
     @State var selectedOption : DestinationSearchOptions = .location
+    @State var startDate : Date = Date()
+    @State var endDate : Date = Date()
+    @State var numGuests : Int = 0
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 40.0) {
-            Button {
-                withAnimation(.snappy) {
-                    show.toggle()
-                }
-            } label: {
-                Image(systemName: "xmark")
-                    .font(.caption)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.black)
-                    .padding(6)
-                    .overlay{
-                        Circle()
-                            .stroke(lineWidth: 2)
-                            .fill(.gray.opacity(0.5))
+        VStack {
+             // Dismiss and Clear button
+            HStack {
+                Button {
+                    withAnimation(.snappy) {
+                        show.toggle()
                     }
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.caption)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.black)
+                        .padding(6)
+                        .overlay{
+                            Circle()
+                                .stroke(lineWidth: 2)
+                                .fill(.gray.opacity(0.5))
+                        }
+                }
+                Spacer()
+                Button("Clear") {
+                    if !searchText.isEmpty {
+                        searchText = ""
+                    }
+                }
+                .foregroundStyle(.black)
+                .fontWeight(.medium)
             }
+            .padding(.horizontal)
+            .padding(.bottom, 30)
+            
             // Where to
-            VStack(alignment: .leading, spacing: 15.0) {
+            VStack(alignment: .leading) {
                 if selectedOption == .location {
                     Text("Where to?")
-                        .font(.title2)
+                        .font(.title)
                         .fontWeight(.semibold)
                     HStack{
                         Image(systemName: "magnifyingglass")
                             .foregroundStyle(.black.opacity(0.5))
                         TextField("Search destinations", text: $searchText)
-                    } .padding(5)
-                        .padding(.horizontal, 10)
-                        .frame(height: 50)
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 15)
-                                .stroke(lineWidth: 1)
-                                .fill(Color.gray.opacity(0.5))
-                        }
+                    }
+                    .frame(height: 50)
+                    .padding(.horizontal, 10)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 15)
+                            .stroke(lineWidth: 1)
+                            .fill(Color.gray.opacity(0.5))
+                    }
                     
                 } else {
                     CollapsedPickerView(title: "Where", description: "Add Description")
                 }
             }
-            .padding()
-            .frame(height: selectedOption == .location ? 120 : 60)
-            .background(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 15))
-            .shadow(radius: 10)
-            .onTapGesture {
-                withAnimation(.snappy()) {
-                    selectedOption = .location
-
-                }
-            }
+            .modifier(CollapsibleDestinationViewModifier())
+            .frame(height: selectedOption == .location ? 150 : 64)
+            .onTapGesture {withAnimation(.snappy()) {selectedOption = .location}}
             
             //Date
-            
-            VStack(alignment: .leading, spacing: 15.0) {
+            VStack(alignment: .leading) {
                 if selectedOption == .date {
-                    
-                    HStack{
-                        Text("Show Expand View")
-                            .font(.title2)
-                            .fontWeight(.semibold)
-                    } .padding(5)
-                        .padding(.horizontal, 10)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 50)
-                        
+                    Text("When's your trip?")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                    VStack {
+                        DatePicker("From", selection: $startDate, displayedComponents: .date)
+                        Divider()
+                        DatePicker("To", selection: $endDate, displayedComponents: .date)
+                    } .foregroundStyle(.gray)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
                     
                 } else {
                     CollapsedPickerView(title: "When", description: "Add Dates")
                 }
             }
-            .padding()
-            .frame(height: selectedOption == .date ? 120 : 60)
-            .background(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 15))
-            .shadow(radius: 10)
+            .modifier(CollapsibleDestinationViewModifier())
+            .frame(height: selectedOption == .date ? 180 : 64)
             .onTapGesture {
-                withAnimation(.snappy()) {
-                    selectedOption = .date
-
-                }
+                withAnimation(.snappy) {selectedOption = .date}
             }
             
             // Guests
-            VStack(alignment: .leading, spacing: 15.0) {
+            VStack(alignment: .leading) {
                 if selectedOption == .guests {
+                    Text("Who's Coming")
+                        .font(.title)
+                        .fontWeight(.semibold)
                     
-                    HStack{
-                        Text("Show Expand View")
-                            .font(.title2)
-                            .fontWeight(.semibold)
-                    } .padding(5)
-                        .padding(.horizontal, 10)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 50)
-                        
                     
+                    Stepper {
+                        Text("\(numGuests) Adults")
+                    } onIncrement: {
+                        numGuests += 1
+                    }
+                    onDecrement: {
+                        guard numGuests > 0 else { return }
+                        numGuests -= 1
+                    }
                 } else {
                     CollapsedPickerView(title: "Who", description: "Add Guests")
                 }
             }
-            .padding()
-            .frame(height: selectedOption == .guests ? 120 : 60)
-            .background(.white)
-            .clipShape(RoundedRectangle(cornerRadius: 15))
-            .shadow(radius: 10)
+            .modifier(CollapsibleDestinationViewModifier())
+            .frame(height: selectedOption == .guests ? 120 : 64)
             .onTapGesture {
-                withAnimation(.snappy()) {
-                    selectedOption = .guests
-
-                }
+                withAnimation(.snappy) {selectedOption = .guests }
             }
             
+            Spacer()
             
-            
-        } .padding()
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        }
     }
 }
 
@@ -144,25 +142,37 @@ struct DestinationSearchView: View {
     DestinationSearchView(show: .constant(false))
 }
 
+struct CollapsibleDestinationViewModifier : ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .padding()
+            .background(.white)
+            .clipShape(RoundedRectangle(cornerRadius: 15))
+            .padding()
+            .shadow(radius: 10)
+        
+    }
+}
+
+
 struct CollapsedPickerView : View {
     
     let title: String
     let description: String
     
     var body: some View {
-        HStack {
-            Text(title)
-                .foregroundStyle(.gray)
-                .fontWeight(.semibold)
-            Spacer()
-            Text(description)
-                .fontWeight(.semibold)
+        VStack {
+            HStack {
+                Text(title)
+                    .foregroundStyle(.gray)
+                Spacer()
+                Text(description)
+                
+            }
+            .fontWeight(.semibold)
+            .font(.subheadline)
         }
-        //        .padding()
-        //        .frame(height: 60)
-        //        .background(.white)
-        //        .clipShape(RoundedRectangle(cornerRadius: 10))
-        //        .shadow(radius: 10)
         
     }
 }
+

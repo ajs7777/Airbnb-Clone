@@ -17,7 +17,7 @@ class DeveloperPreview {
             ownerUid: NSUUID().uuidString,
             ownerName: "John Smith",
             ownerImageUrl: "john",
-            numberofBedrooms: 4,
+            numberofBedrooms: 3,
             numberofBathrooms: 3,
             numberofGuests: 4,
             numberofBeds: 4,

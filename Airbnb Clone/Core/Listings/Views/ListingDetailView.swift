@@ -151,6 +151,7 @@ struct ListingDetailView: View {
                 }.padding()
          
         }
+        .toolbarVisibility(.hidden, for: .tabBar)
         .ignoresSafeArea()
         .overlay(alignment: .bottom) {
             VStack{

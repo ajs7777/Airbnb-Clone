@@ -9,16 +9,11 @@ import SwiftUI
 
 struct ListingItemCarouseView: View {
     
-    var images = [
-        "listing-1",
-        "listing-2",
-        "listing-3",
-        "listing-4"
-    ]
+    let listings: Listing
     
     var body: some View {
         TabView {
-            ForEach(images, id: \.self) { image in
+            ForEach(listings.imageUrls, id: \.self) { image in
                 Image(image)
                     .resizable()
                     .scaledToFill()
@@ -31,5 +26,5 @@ struct ListingItemCarouseView: View {
 }
 
 #Preview {
-    ListingItemCarouseView()
+    ListingItemCarouseView(listings: DeveloperPreview.shared.listings[0])
 }

@@ -16,7 +16,7 @@ enum DestinationSearchOptions {
 struct DestinationSearchView: View {
     
     @Binding var show : Bool
-    @State var searchText = ""
+    @ObservedObject var vm :  ExploreViewModel
     @State var selectedOption : DestinationSearchOptions = .location
     @State var startDate : Date = Date()
     @State var endDate : Date = Date()
@@ -28,6 +28,7 @@ struct DestinationSearchView: View {
             HStack {
                 Button {
                     withAnimation(.snappy) {
+                        vm.updateListingsForLocation()
                         show.toggle()
                     }
                 } label: {
@@ -44,8 +45,9 @@ struct DestinationSearchView: View {
                 }
                 Spacer()
                 Button("Clear") {
-                    if !searchText.isEmpty {
-                        searchText = ""
+                    if !vm.searchLocation.isEmpty {
+                        vm.searchLocation = ""
+                        vm.updateListingsForLocation()
                     }
                 }
                 .foregroundStyle(.black)
@@ -63,7 +65,10 @@ struct DestinationSearchView: View {
                     HStack{
                         Image(systemName: "magnifyingglass")
                             .foregroundStyle(.black.opacity(0.5))
-                        TextField("Search destinations", text: $searchText)
+                        TextField("Search destinations", text: $vm.searchLocation)
+                            .onSubmit {
+                                vm.updateListingsForLocation()
+                            }
                     }
                     .frame(height: 50)
                     .padding(.horizontal, 10)
@@ -139,7 +144,7 @@ struct DestinationSearchView: View {
 }
 
 #Preview {
-    DestinationSearchView(show: .constant(false))
+    DestinationSearchView(show: .constant(false), vm: ExploreViewModel(service: ExploreService()))
 }
 
 struct CollapsibleDestinationViewModifier : ViewModifier {
